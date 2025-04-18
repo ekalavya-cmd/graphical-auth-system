@@ -18,23 +18,27 @@ The Graphical Authentication System (GAS) is an innovative web-based application
 
 ## Installation
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/ekalavya-cmd/graphical-auth-system.git
    ```
-2. Navigate to the project directory:
+3. Navigate to the project directory:
+   
    ```bash
    cd graphical-auth
    ```
-3. Install the required dependencies:
+5. Install the required dependencies:
+   
    ```bash
    cd graphical-auth
    ```
-4. Set up MongoDB locally and ensure it is running. Update the connection string in `server.js` (e.g., `mongodb://localhost/auth_system`) if necessary.
-5. Start the server:
+7. Set up MongoDB locally and ensure it is running. Update the connection string in `server.js` (e.g., `mongodb://localhost/auth_system`) if necessary.
+9. Start the server:
+    
    ```bash
    node server.js
    ```
-6. Open your web browser and visit `http://localhost:3000` to access the application.
+11. Open your web browser and visit `http://localhost:3000` to access the application.
 
 ## Usage
 1. Registration:

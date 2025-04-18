@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Layer 8</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Name Pairing Login</h1>
+      <div id="error-message" class="error"></div>
+      <div class="pairing-container">
+        <div class="left-names" id="left-names"></div>
+        <div class="right-names" id="right-names"></div>
+      </div>
+      <div id="pairing-display">
+        Pairings: <span id="pairing-output"></span>
+      </div>
+      <div class="button-container">
+        <button type="button" onclick="clearPairings()">Clear</button>
+        <button type="submit" form="form">Login</button>
+      </div>
+      <form id="form" action="/login/layer8" method="POST">
+        <input type="hidden" name="pairings" id="pairings" />
+      </form>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("form");
+        const errorDiv = document.getElementById("error-message");
+        const pairingOutput = document.getElementById("pairing-output");
+        const leftNames = document.getElementById("left-names");
+        const rightNames = document.getElementById("right-names");
+        let pairings = {};
+
+        // Define name options
+        const leftNamesData = [
+          { name: "Alice", display: "Alice" },
+          { name: "Bob", display: "Bob" },
+          { name: "Charlie", display: "Charlie" },
+        ];
+        const rightNamesData = [
+          { name: "Rose", display: "Rose" },
+          { name: "Lily", display: "Lily" },
+          { name: "Daisy", display: "Daisy" },
+        ];
+
+        // Shuffle function using Fisher-Yates
+        function shuffle(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+          return array;
+        }
+
+        // Initialize and shuffle names
+        function initNames() {
+          leftNames.innerHTML = "";
+          rightNames.innerHTML = "";
+          const shuffledLeft = shuffle([...leftNamesData]);
+          const shuffledRight = shuffle([...rightNamesData]);
+          shuffledLeft.forEach((name) => {
+            const div = document.createElement("div");
+            div.className = "name";
+            div.setAttribute("draggable", "true");
+            div.setAttribute("data-name", name.name);
+            div.textContent = name.display;
+            leftNames.appendChild(div);
+          });
+          shuffledRight.forEach((name) => {
+            const div = document.createElement("div");
+            div.className = "name-drop";
+            div.setAttribute("data-name", name.name);
+            div.textContent = name.display;
+            rightNames.appendChild(div);
+          });
+        }
+
+        // Drag and drop handlers
+        leftNames.addEventListener("dragstart", (e) => {
+          const name = e.target.getAttribute("data-name");
+          e.dataTransfer.setData("text/plain", name);
+        });
+
+        rightNames.addEventListener("dragover", (e) => e.preventDefault());
+        rightNames.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const leftName = e.dataTransfer.getData("text/plain");
+          const dropTarget = e.target.closest(".name-drop");
+          if (dropTarget && !dropTarget.getAttribute("data-paired")) {
+            const rightName = dropTarget.getAttribute("data-name");
+            pairings[leftName] = rightName;
+            dropTarget.setAttribute("data-paired", "true");
+            dropTarget.textContent = `${leftName} ↔ ${rightName}`;
+            pairingOutput.textContent = JSON.stringify(pairings);
+            document.getElementById("pairings").value =
+              JSON.stringify(pairings);
+          }
+        });
+
+        window.clearPairings = () => {
+          pairings = {};
+          pairingOutput.textContent = "";
+          document.getElementById("pairings").value = "";
+          errorDiv.textContent = "";
+          const drops = rightNames.querySelectorAll(".name-drop");
+          drops.forEach((drop) => {
+            drop.removeAttribute("data-paired");
+            drop.textContent = drop.getAttribute("data-name");
+          });
+          initNames(); // Shuffle names on clear
+        };
+
+        initNames(); // Shuffle names on page load
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          errorDiv.textContent = "";
+          if (Object.keys(pairings).length !== 3) {
+            errorDiv.textContent = "Please pair all 3 names.";
+            return;
+          }
+
+          try {
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const [name, value] of formData) {
+              params.append(name, value);
+            }
+            const response = await fetch(form.action, {
+              method: "POST",
+              body: params,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            });
+
+            if (response.ok) {
+              window.location.href = "/home.html";
+            } else {
+              const data = await response.json();
+              errorDiv.textContent = data.error || "An error occurred.";
+            }
+          } catch (error) {
+            errorDiv.textContent = "An error occurred. Please try again.";
+            console.error("Fetch error:", error);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

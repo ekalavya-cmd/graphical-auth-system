@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register Layer 1</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Text-based Registration</h1>
+      <div id="email-error" class="error"></div>
+      <form id="register-form" action="/register/layer1" method="POST">
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="text" name="username" placeholder="Username" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+        <div class="button-container">
+          <button type="button" onclick="clearForm()">Clear</button>
+          <button type="submit">Next</button>
+        </div>
+      </form>
+      <a href="/">Back to Login</a>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("register-form");
+        const emailInput = form.querySelector('input[name="email"]');
+        const errorDiv = document.getElementById("email-error");
+
+        // Real-time validation and error clearing
+        emailInput.addEventListener("input", () => {
+          errorDiv.textContent = ""; // Clear error as user types
+          if (emailInput.value && !emailInput.value.endsWith("@gas.com")) {
+            errorDiv.textContent = "Email must end with @gas.com";
+          }
+        });
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          errorDiv.textContent = ""; // Clear previous error
+
+          try {
+            if (!emailInput.value.endsWith("@gas.com")) {
+              errorDiv.textContent = "Email must end with @gas.com";
+              return; // Prevent form submission
+            }
+
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const [name, value] of formData) {
+              params.append(name, value);
+            }
+            const response = await fetch(form.action, {
+              method: "POST",
+              body: params,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            });
+
+            if (response.ok) {
+              window.location.href = "/register2.html";
+            } else {
+              const data = await response.json();
+              errorDiv.textContent = data.error || "An error occurred.";
+            }
+          } catch (error) {
+            errorDiv.textContent = "An error occurred. Please try again.";
+            console.error("Fetch error:", error);
+          }
+        });
+
+        if (
+          document.querySelector('input[type="email"], input[type="password"]')
+        ) {
+          window.clearForm = clearForm;
+        }
+      });
+    </script>
+  </body>
+</html>

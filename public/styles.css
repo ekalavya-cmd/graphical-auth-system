@@ -1,0 +1,486 @@
+/* Enhanced styles.css with eye-catching design */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Define CSS variables with vibrant palette */
+:root {
+  --primary-color: #ff4d4d; /* Vibrant red */
+  --secondary-color: #4d79ff; /* Bold blue */
+  --background-color: #f0f4ff; /* Soft gradient base */
+  --text-color: #1a1a1a;
+  --accent-color: #ffcc00; /* Bright yellow */
+  --glass-bg: rgba(255, 255, 255, 0.2);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --font-family: "Poppins", sans-serif;
+}
+
+/* Global styles with gradient background */
+body {
+  font-family: var(--font-family);
+  background: linear-gradient(135deg, #6e8efb, #a8b5ff);
+  color: var(--text-color);
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+/* Main container with glassmorphism effect */
+main {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 8px 30px var(--shadow-color);
+  max-width: 650px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid var(--glass-border);
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+main:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 40px var(--shadow-color);
+}
+
+/* Header styles with animated gradient */
+h1 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  color: var(--primary-color);
+  background: linear-gradient(
+    45deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientShift 6s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Form styles */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+/* Input fields with glow effect */
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  width: 100%;
+  max-width: 450px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  box-shadow: 0 0 15px var(--primary-color);
+  transform: scale(1.02);
+  outline: none;
+}
+
+/* Button container */
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Button styles with neon effect */
+button {
+  padding: 12px 25px;
+  background: linear-gradient(
+    45deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  min-width: 120px;
+}
+
+button::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px var(--primary-color);
+}
+
+button:hover::after {
+  transform: translate(-50%, -50%) scale(2);
+}
+
+button[type="button"] {
+  background: linear-gradient(45deg, var(--secondary-color), #6c757d);
+}
+
+button[type="button"]:hover {
+  box-shadow: 0 0 20px var(--secondary-color);
+}
+
+/* Canvas styles with animated border */
+canvas {
+  border: 2px solid transparent;
+  border-radius: 10px;
+  margin: 25px auto;
+  display: block;
+  max-width: 300px;
+  width: 100%;
+  cursor: crosshair;
+  background: #ffffff;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  animation: borderPulse 2s infinite;
+}
+
+@keyframes borderPulse {
+  0% {
+    border-color: transparent;
+  }
+  50% {
+    border-color: var(--accent-color);
+  }
+  100% {
+    border-color: transparent;
+  }
+}
+
+#image-canvas {
+  max-width: 600px;
+  width: 100%;
+  height: 400px;
+}
+
+/* Color wheel canvas for Layer 3 */
+#color-wheel {
+  max-width: 300px;
+  width: 100%;
+  height: 300px;
+}
+
+/* Selected colors display - Restored visibility, kept space */
+#selected {
+  margin-bottom: 20px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 30px; /* Predefined space */
+}
+
+.selected-color {
+  width: 25px;
+  height: 25px;
+  border: 2px solid var(--glass-border);
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.selected-color:hover {
+  transform: scale(1.2);
+}
+
+/* Pattern canvas for Layer 4 */
+#canvas.pattern {
+  background: linear-gradient(45deg, #e0e0e0, #ffffff);
+  border: 2px solid var(--text-color);
+}
+
+/* Links with hover animation */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  margin-top: 20px;
+  display: inline-block;
+  position: relative;
+  padding-bottom: 3px;
+}
+
+a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background: var(--accent-color);
+  transition: width 0.3s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* Dropdown for layer selection */
+select {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  width: 100%;
+  max-width: 450px;
+  background: var(--glass-bg);
+  box-shadow: 0 4px 15px var(--shadow-color);
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+select:focus {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px var(--primary-color);
+  outline: none;
+}
+
+/* Accessibility improvements */
+button:focus,
+a:focus,
+canvas:focus {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 3px;
+}
+
+/* Error message styling - Red text, kept space */
+.error {
+  color: var(--primary-color); /* Red color for errors */
+  font-size: 14px;
+  margin-bottom: 15px;
+  display: block;
+  min-height: 25px; /* Predefined space */
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  main {
+    padding: 25px;
+    max-width: 90%;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  button {
+    font-size: 14px;
+    min-width: 100px;
+  }
+
+  canvas {
+    max-width: 250px;
+  }
+
+  #image-canvas {
+    max-width: 300px;
+    height: 200px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select {
+    max-width: 100%;
+  }
+}
+
+/* Emoji-specific styles */
+#emoji-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 25px 0;
+  background: var(--glass-bg);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.emoji-option {
+  font-size: 32px;
+  cursor: pointer;
+  padding: 12px;
+  border: 2px solid var(--text-color);
+  border-radius: 8px;
+  transition: transform 0.3s ease, background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.emoji-option:hover {
+  transform: scale(1.3);
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 0 15px var(--primary-color);
+}
+
+#selected-sequence {
+  margin: 20px 0;
+  font-size: 18px;
+  color: var(--text-color);
+  background: var(--glass-bg);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.pairing-container {
+  display: flex;
+  justify-content: space-around;
+  margin: 25px 0;
+  background: var(--glass-bg);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.left-names,
+.right-names {
+  width: 40%;
+}
+
+.name,
+.name-drop {
+  padding: 12px;
+  margin: 8px 0;
+  border: 2px solid var(--text-color);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.name:hover,
+.name-drop:hover {
+  background: var(--primary-color);
+  color: white;
+  transform: translateY(-3px);
+}
+
+.name-drop[data-paired] {
+  background: #4caf50;
+  color: white;
+  box-shadow: 0 0 10px #4caf50;
+}
+
+/* Audio label styles */
+#audio-container {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0px; /* Reduced gap between audio clips */
+  margin-bottom: 20px;
+  margin-left: 15px;
+}
+
+.audio-label {
+  font-family: var(--font-family);
+  font-size: 18px;
+  color: var(--secondary-color);
+  background: linear-gradient(
+    45deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 7px;
+  border: 2px solid var(--glass-border);
+  border-radius: 8px;
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.audio-label:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--secondary-color);
+}
+
+/* Selected audio styles */
+.selected-audio {
+  font-family: var(--font-family);
+  font-size: 16px;
+  color: var(--text-color);
+  background: var(--glass-bg);
+  padding: 8px 15px;
+  border-radius: 8px;
+  display: inline-block;
+  margin: 5px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.selected-audio:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px var(--primary-color);
+}
+
+/* Audio container */
+#audio-container audio {
+  display: block;
+  margin: 10px 0;
+}
+
+/* Ensure audio container fits within main on smaller screens */
+@media (max-width: 600px) {
+  #audio-container {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .audio-label {
+    font-size: 14px;
+    padding: 8px;
+    margin-right: 5px;
+  }
+}

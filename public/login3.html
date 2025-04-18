@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Layer 3</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Color-based Login</h1>
+      <div id="error-message" class="error"></div>
+      <canvas id="color-wheel" width="300" height="300"></canvas>
+      <div id="selected"></div>
+      <div class="button-container">
+        <button type="button" onclick="clearSelection()">Clear</button>
+        <button type="submit" form="form">Login</button>
+      </div>
+      <form id="form" action="/login/layer3" method="POST">
+        <input type="hidden" name="colors" id="colorsInput" />
+      </form>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("form");
+        const errorDiv = document.getElementById("error-message");
+
+        if (
+          document.getElementById("color-wheel") &&
+          document.getElementById("colorsInput")
+        ) {
+          const colorWheel = initColorWheel(
+            "color-wheel",
+            "selected",
+            "colorsInput"
+          );
+          window.clearSelection = colorWheel.clear;
+
+          form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errorDiv.textContent = ""; // Clear previous error
+
+            try {
+              const formData = new FormData(form);
+              const colors = JSON.parse(
+                document.getElementById("colorsInput").value || "[]"
+              );
+              if (colors.length < 3) {
+                errorDiv.textContent = "Please select at least 3 colors.";
+                return;
+              }
+              const params = new URLSearchParams();
+              for (const [name, value] of formData) {
+                params.append(name, value);
+              }
+              const response = await fetch(form.action, {
+                method: "POST",
+                body: params,
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+              });
+
+              if (response.ok) {
+                window.location.href = "/home.html";
+              } else {
+                const data = await response.json();
+                errorDiv.textContent = data.error || "An error occurred.";
+              }
+            } catch (error) {
+              errorDiv.textContent = "An error occurred. Please try again.";
+              console.error("Fetch error:", error);
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

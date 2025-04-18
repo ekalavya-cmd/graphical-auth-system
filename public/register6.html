@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register Layer 6</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Puzzle Piece Registration</h1>
+      <div id="error-message" class="error"></div>
+      <canvas id="puzzle-canvas" width="400" height="400"></canvas>
+      <div class="button-container">
+        <button type="button" onclick="clearPuzzle()">Clear</button>
+        <button type="submit" form="form">Next</button>
+      </div>
+      <form id="form" action="/register/layer6" method="POST">
+        <input type="hidden" name="puzzle" id="puzzle" />
+      </form>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("form");
+        const errorDiv = document.getElementById("error-message");
+        const canvas = document.getElementById("puzzle-canvas");
+        const ctx = canvas.getContext("2d");
+        let pieces = [];
+        let selectedPiece = null;
+
+        // Grid configuration
+        const GRID_SIZE = 133; // Adjusted for 3x3 grid (400 / 3, rounded)
+        const GRID_OFFSET = 1;
+        const GRID_ROWS = 3;
+        const GRID_COLS = 3;
+        const grid = [];
+        for (let y = 0; y < GRID_ROWS; y++) {
+          for (let x = 0; x < GRID_COLS; x++) {
+            grid.push({
+              x: GRID_OFFSET + x * GRID_SIZE,
+              y: GRID_OFFSET + y * GRID_SIZE,
+              occupied: false,
+            });
+          }
+        }
+
+        // Initialize 9 puzzle pieces with numbers and initial grid positions
+        function initPieces() {
+          pieces = [];
+          for (let i = 0; i < 9; i++) {
+            pieces.push({
+              x: grid[i].x + (GRID_SIZE - 80) / 2,
+              y: grid[i].y + (GRID_SIZE - 80) / 2,
+              width: 80,
+              height: 80,
+              zIndex: 0,
+              number: i + 1, // Numbers 1 through 9
+              gridIndex: i,
+              prevX: null,
+              prevY: null,
+              prevGridIndex: null,
+            });
+            grid[i].occupied = true;
+          }
+          drawPuzzle();
+        }
+
+        // Draw grid lines and pieces with numbers and selection highlight
+        function drawPuzzle() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          // Draw grid lines
+          ctx.strokeStyle = "#ccc";
+          ctx.lineWidth = 2;
+          for (
+            let x = GRID_OFFSET;
+            x <= canvas.width - GRID_OFFSET;
+            x += GRID_SIZE
+          ) {
+            ctx.beginPath();
+            ctx.moveTo(x, GRID_OFFSET);
+            ctx.lineTo(x, canvas.height - GRID_OFFSET);
+            ctx.stroke();
+          }
+          for (
+            let y = GRID_OFFSET;
+            y <= canvas.height - GRID_OFFSET;
+            y += GRID_SIZE
+          ) {
+            ctx.beginPath();
+            ctx.moveTo(GRID_OFFSET, y);
+            ctx.lineTo(canvas.width - GRID_OFFSET, y);
+            ctx.stroke();
+          }
+          // Draw pieces with numbers
+          pieces.forEach((piece) => {
+            ctx.fillStyle = "black";
+            ctx.font = "bold 40px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(
+              piece.number.toString(),
+              piece.x + piece.width / 2,
+              piece.y + piece.height / 2
+            );
+            ctx.strokeStyle = selectedPiece === piece ? "yellow" : "black";
+            ctx.lineWidth = selectedPiece === piece ? 4 : 2;
+            ctx.strokeRect(piece.x, piece.y, piece.width, piece.height);
+          });
+        }
+
+        // Find target grid index based on click
+        function findTargetGridIndex(x, y) {
+          return grid.findIndex((cell) => {
+            return (
+              x >= cell.x &&
+              x <= cell.x + GRID_SIZE &&
+              y >= cell.y &&
+              y <= cell.y + GRID_SIZE
+            );
+          });
+        }
+
+        // Handle click events
+        canvas.addEventListener("click", (e) => {
+          const rect = canvas.getBoundingClientRect();
+          const mouseX = e.clientX - rect.left;
+          const mouseY = e.clientY - rect.top;
+
+          // First click: select a piece
+          let clickedPiece = pieces.find((piece) => {
+            return (
+              mouseX >= piece.x &&
+              mouseX <= piece.x + piece.width &&
+              mouseY >= piece.y &&
+              mouseY <= piece.y + piece.height
+            );
+          });
+          if (clickedPiece && !selectedPiece) {
+            selectedPiece = clickedPiece;
+            // Store current position as previous if not already set
+            if (selectedPiece.prevX === null) {
+              selectedPiece.prevX = selectedPiece.x;
+              selectedPiece.prevY = selectedPiece.y;
+              selectedPiece.prevGridIndex = selectedPiece.gridIndex;
+            }
+            drawPuzzle();
+            return;
+          }
+
+          // Second click: swap or backtrack
+          if (selectedPiece) {
+            const targetIndex = findTargetGridIndex(mouseX, mouseY);
+            if (targetIndex !== -1) {
+              const targetPiece = pieces.find(
+                (piece) => piece.gridIndex === targetIndex
+              );
+              if (targetPiece && targetPiece !== selectedPiece) {
+                // Swap with another piece
+                selectedPiece.prevX = selectedPiece.x;
+                selectedPiece.prevY = selectedPiece.y;
+                selectedPiece.prevGridIndex = selectedPiece.gridIndex;
+                targetPiece.prevX = targetPiece.x;
+                targetPiece.prevY = targetPiece.y;
+                targetPiece.prevGridIndex = targetPiece.gridIndex;
+                const tempX = selectedPiece.x;
+                const tempY = selectedPiece.y;
+                const tempGridIndex = selectedPiece.gridIndex;
+                selectedPiece.x = targetPiece.x;
+                selectedPiece.y = targetPiece.y;
+                selectedPiece.gridIndex = targetPiece.gridIndex;
+                targetPiece.x = tempX;
+                targetPiece.y = tempY;
+                targetPiece.gridIndex = tempGridIndex;
+                grid[selectedPiece.gridIndex].occupied = true;
+                grid[targetPiece.gridIndex].occupied = true;
+              } else if (clickedPiece === selectedPiece) {
+                // Backtrack to previous position
+                if (selectedPiece.prevX !== null) {
+                  const prevGridIndex = selectedPiece.prevGridIndex;
+                  selectedPiece.x = selectedPiece.prevX;
+                  selectedPiece.y = selectedPiece.prevY;
+                  selectedPiece.gridIndex = prevGridIndex;
+                  grid[prevGridIndex].occupied = true;
+                  // Clear previous position if backtracked
+                  selectedPiece.prevX = null;
+                  selectedPiece.prevY = null;
+                  selectedPiece.prevGridIndex = null;
+                }
+              }
+              const puzzleData = pieces.map((piece) => ({
+                x: piece.x,
+                y: piece.y,
+              }));
+              document.getElementById("puzzle").value =
+                JSON.stringify(puzzleData);
+              selectedPiece = null;
+              drawPuzzle();
+            }
+          }
+        });
+
+        window.clearPuzzle = () => {
+          initPieces();
+          selectedPiece = null;
+          document.getElementById("puzzle").value = "";
+          if (errorDiv) errorDiv.textContent = "";
+        };
+
+        initPieces();
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          errorDiv.textContent = "";
+          const puzzleInput = document.getElementById("puzzle");
+          if (!puzzleInput.value || puzzleInput.value.trim() === "") {
+            errorDiv.textContent =
+              "Please arrange the puzzle pieces before submitting.";
+            return;
+          }
+
+          try {
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const [name, value] of formData) {
+              params.append(name, value);
+            }
+            const response = await fetch(form.action, {
+              method: "POST",
+              body: params,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            });
+
+            if (response.ok) {
+              window.location.href = "/register7.html";
+            } else {
+              const data = await response.json();
+              errorDiv.textContent = data.error || "An error occurred.";
+            }
+          } catch (error) {
+            errorDiv.textContent = "An error occurred. Please try again.";
+            console.error("Fetch error:", error);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

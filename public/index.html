@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Login</h1>
+      <div id="error-message" class="error"></div>
+      <form id="login-form" action="/identify" method="POST">
+        <input
+          type="text"
+          name="identifier"
+          placeholder="Email or Username"
+          required
+        />
+        <div class="button-container">
+          <button type="button" onclick="clearForm()">Clear</button>
+          <button type="submit">Next</button>
+        </div>
+      </form>
+      <a href="/register1.html">New to GAS? Register</a>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("login-form");
+        const errorDiv = document.getElementById("error-message");
+        const identifierInput = form.querySelector('input[name="identifier"]');
+
+        // Clear error when user starts typing
+        identifierInput.addEventListener("input", () => {
+          if (errorDiv.textContent) errorDiv.textContent = "";
+        });
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          errorDiv.textContent = ""; // Clear previous error
+
+          try {
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const [name, value] of formData) {
+              params.append(name, value);
+            }
+            const response = await fetch(form.action, {
+              method: "POST",
+              body: params,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            });
+
+            if (response.ok) {
+              window.location.href = "/select.html";
+            } else {
+              const data = await response.json();
+              errorDiv.textContent = data.error || "An error occurred.";
+            }
+          } catch (error) {
+            errorDiv.textContent = "An error occurred. Please try again.";
+            console.error("Fetch error:", error);
+          }
+        });
+
+        if (
+          document.querySelector('input[type="email"], input[type="password"]')
+        ) {
+          window.clearForm = clearForm;
+        }
+      });
+    </script>
+  </body>
+</html>

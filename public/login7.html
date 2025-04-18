@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login Layer 7</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <h1>Emoji Sequence Login</h1>
+      <div id="error-message" class="error"></div>
+      <div id="emoji-container"></div>
+      <div id="selected-sequence">
+        Selected: <span id="sequence-display"></span>
+      </div>
+      <div class="button-container">
+        <button type="button" onclick="clearSequence()">Clear</button>
+        <button type="submit" form="form">Login</button>
+      </div>
+      <form id="form" action="/login/layer7" method="POST">
+        <input type="hidden" name="emojiSequence" id="emojiSequence" />
+      </form>
+    </main>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("form");
+        const errorDiv = document.getElementById("error-message");
+        const sequenceDisplay = document.getElementById("sequence-display");
+        const emojiContainer = document.getElementById("emoji-container");
+        let selectedSequence = [];
+
+        // Define emoji options
+        const emojis = [
+          { code: "😊", display: "😊" },
+          { code: "👍", display: "👍" },
+          { code: "🌟", display: "🌟" },
+          { code: "🎉", display: "🎉" },
+          { code: "❤️", display: "❤️" },
+          { code: "🚀", display: "🚀" },
+          { code: "🐱", display: "🐱" },
+          { code: "❄️", display: "❄️" },
+          { code: "🪐", display: "🪐" },
+          { code: "🔥", display: "🔥" },
+          { code: "☀️", display: "☀️" },
+          { code: "🥳", display: "🥳" },
+          { code: "✨", display: "✨" },
+          { code: "🎮", display: "🎮" },
+        ];
+
+        // Shuffle function using Fisher-Yates
+        function shuffle(array) {
+          for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+          }
+          return array;
+        }
+
+        // Initialize and shuffle emojis
+        function initEmojis() {
+          emojiContainer.innerHTML = "";
+          const shuffledEmojis = shuffle([...emojis]);
+          shuffledEmojis.forEach((emoji) => {
+            const span = document.createElement("span");
+            span.className = "emoji-option";
+            span.setAttribute("data-emoji", emoji.code);
+            span.textContent = emoji.display;
+            emojiContainer.appendChild(span);
+          });
+        }
+
+        // Event delegation for emoji clicks
+        emojiContainer.addEventListener("click", (e) => {
+          const emoji = e.target.closest(".emoji-option");
+          if (emoji && errorDiv.textContent) errorDiv.textContent = "";
+          if (emoji) {
+            const emojiCode = emoji.getAttribute("data-emoji");
+            selectedSequence.push(emojiCode);
+            sequenceDisplay.textContent = selectedSequence.join(" ");
+            document.getElementById("emojiSequence").value =
+              JSON.stringify(selectedSequence);
+          }
+        });
+
+        window.clearSequence = () => {
+          selectedSequence = [];
+          sequenceDisplay.textContent = "";
+          document.getElementById("emojiSequence").value = "";
+          if (errorDiv) errorDiv.textContent = "";
+          initEmojis(); // Shuffle emojis on clear
+        };
+
+        initEmojis(); // Shuffle emojis on page load
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          errorDiv.textContent = "";
+          if (selectedSequence.length < 3) {
+            errorDiv.textContent = "Please select at least 3 emojis.";
+            return;
+          }
+
+          try {
+            const formData = new FormData(form);
+            const params = new URLSearchParams();
+            for (const [name, value] of formData) {
+              params.append(name, value);
+            }
+            const response = await fetch(form.action, {
+              method: "POST",
+              body: params,
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+            });
+
+            if (response.ok) {
+              window.location.href = "/home.html";
+            } else {
+              const data = await response.json();
+              errorDiv.textContent = data.error || "An error occurred.";
+            }
+          } catch (error) {
+            errorDiv.textContent = "An error occurred. Please try again.";
+            console.error("Fetch error:", error);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

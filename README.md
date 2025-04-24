@@ -30,7 +30,7 @@ The Graphical Authentication System (GAS) is an innovative web-based application
 5. **Install the required dependencies:**
    
    ```bash
-   cd graphical-auth
+   npm install
    ```
 7. Set up MongoDB locally and ensure it is running. Update the connection string in `server.js` (e.g., `mongodb://localhost/auth_system`) if necessary.
 9. **Start the server:**
